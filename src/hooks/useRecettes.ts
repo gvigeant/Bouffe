@@ -10,8 +10,7 @@ import {
   query,
   orderBy,
 } from 'firebase/firestore'
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage'
-import { db, storage } from '../firebase'
+import { db } from '../firebase'
 import type { Recette } from '../types'
 
 type RecetteDraft = Omit<Recette, 'id' | 'dateAjout'>
@@ -29,37 +28,20 @@ export function useRecettes() {
     return unsub
   }, [])
 
-  const ajouterRecette = useCallback(async (draft: RecetteDraft, photoFile?: File) => {
-    let photoURL = draft.photoURL
-    if (photoFile) {
-      const storageRef = ref(storage, `recettes/${Date.now()}_${photoFile.name}`)
-      const snap = await uploadBytes(storageRef, photoFile)
-      photoURL = await getDownloadURL(snap.ref)
-    }
+  const ajouterRecette = useCallback(async (draft: RecetteDraft) => {
     await addDoc(collection(db, 'recettes'), {
       ...draft,
-      photoURL,
+      photoURL: '',
       dateAjout: serverTimestamp(),
     })
   }, [])
 
-  const modifierRecette = useCallback(async (id: string, draft: Partial<RecetteDraft>, photoFile?: File) => {
-    let updates: Partial<RecetteDraft> & { photoURL?: string } = { ...draft }
-    if (photoFile) {
-      const storageRef = ref(storage, `recettes/${Date.now()}_${photoFile.name}`)
-      const snap = await uploadBytes(storageRef, photoFile)
-      updates.photoURL = await getDownloadURL(snap.ref)
-    }
-    await updateDoc(doc(db, 'recettes', id), updates)
+  const modifierRecette = useCallback(async (id: string, draft: Partial<RecetteDraft>) => {
+    await updateDoc(doc(db, 'recettes', id), draft)
   }, [])
 
-  const supprimerRecette = useCallback(async (id: string, photoURL?: string) => {
+  const supprimerRecette = useCallback(async (id: string) => {
     await deleteDoc(doc(db, 'recettes', id))
-    if (photoURL) {
-      try {
-        await deleteObject(ref(storage, photoURL))
-      } catch { /* ignore si déjà supprimé */ }
-    }
   }, [])
 
   return { recettes, loading, ajouterRecette, modifierRecette, supprimerRecette }

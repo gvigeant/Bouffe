@@ -1,12 +1,12 @@
-import { useState, useRef } from 'react'
-import { X, Plus, Trash2, Camera } from 'lucide-react'
+import { useState } from 'react'
+import { X, Plus, Trash2 } from 'lucide-react'
 import type { Recette, CategorieRecette, Ingredient, RecetteExtraite } from '../../types'
 
 type RecetteDraft = Omit<Recette, 'id' | 'dateAjout'>
 
 interface Props {
   initial?: RecetteExtraite | Partial<RecetteDraft>
-  onSave: (draft: RecetteDraft, photoFile?: File) => Promise<void>
+  onSave: (draft: RecetteDraft) => Promise<void>
   onCancel: () => void
   titre?: string
 }
@@ -35,18 +35,10 @@ export default function RecetteForm({ initial, onSave, onCancel, titre = 'Nouvel
       ordre: i,
     })),
   })
-  const [photoFile, setPhotoFile] = useState<File | undefined>()
-  const [photoPreview, setPhotoPreview] = useState<string>(form.photoURL)
   const [saving, setSaving] = useState(false)
-  const fileRef = useRef<HTMLInputElement>(null)
 
   const setField = <K extends keyof RecetteDraft>(k: K, v: RecetteDraft[K]) =>
     setForm((f) => ({ ...f, [k]: v }))
-
-  const handlePhoto = (file: File) => {
-    setPhotoFile(file)
-    setPhotoPreview(URL.createObjectURL(file))
-  }
 
   const updateIngredient = (id: string, field: keyof Ingredient, value: string) => {
     setForm((f) => ({
@@ -89,7 +81,7 @@ export default function RecetteForm({ initial, onSave, onCancel, titre = 'Nouvel
           .map((i, idx) => ({ ...i, ordre: idx })),
         instructions: form.instructions.filter((s) => s.trim()),
       }
-      await onSave(cleaned, photoFile)
+      await onSave(cleaned)
     } finally {
       setSaving(false)
     }
@@ -113,29 +105,6 @@ export default function RecetteForm({ initial, onSave, onCancel, titre = 'Nouvel
       </div>
 
       <div className="flex-1 overflow-y-auto pb-8">
-        {/* Photo */}
-        <button
-          onClick={() => fileRef.current?.click()}
-          className="w-full aspect-video bg-gray-100 flex flex-col items-center justify-center overflow-hidden relative"
-        >
-          {photoPreview ? (
-            <img src={photoPreview} alt="" className="w-full h-full object-cover" />
-          ) : (
-            <>
-              <Camera size={32} className="text-gray-300 mb-2" />
-              <span className="text-xs text-gray-400">Ajouter une photo</span>
-            </>
-          )}
-        </button>
-        <input
-          ref={fileRef}
-          type="file"
-          accept="image/*"
-          capture="environment"
-          className="hidden"
-          onChange={(e) => e.target.files?.[0] && handlePhoto(e.target.files[0])}
-        />
-
         <div className="p-4 space-y-5">
           {/* Titre */}
           <div>

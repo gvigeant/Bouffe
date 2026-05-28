@@ -40,8 +40,8 @@ export default function RecettesPage() {
       <RecetteForm
         initial={extrait ?? undefined}
         titre={extrait ? 'Vérifier la recette' : 'Nouvelle recette'}
-        onSave={async (draft, photoFile) => {
-          await ajouterRecette(draft, photoFile)
+        onSave={async (draft) => {
+          await ajouterRecette(draft)
           setVue('liste')
           setExtrait(null)
         }}

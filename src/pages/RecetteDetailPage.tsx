@@ -29,8 +29,8 @@ export default function RecetteDetailPage() {
       <RecetteForm
         initial={recette}
         titre="Modifier la recette"
-        onSave={async (draft, photoFile) => {
-          await modifierRecette(recette.id, draft, photoFile)
+        onSave={async (draft) => {
+          await modifierRecette(recette.id, draft)
           setEditMode(false)
         }}
         onCancel={() => setEditMode(false)}
@@ -59,7 +59,7 @@ export default function RecetteDetailPage() {
       listes={listes}
       onModifier={() => setEditMode(true)}
       onSupprimer={async () => {
-        await supprimerRecette(recette.id, recette.photoURL)
+        await supprimerRecette(recette.id)
         navigate(-1)
       }}
       onAjouterAListe={handleAjouterAListe}
