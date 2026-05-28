@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { X, Search } from 'lucide-react'
 import type { Recette } from '../../types'
+import { useKeyboardOffset } from '../../hooks/useKeyboardOffset'
 
 interface Props {
   date: string
@@ -10,6 +11,7 @@ interface Props {
 }
 
 export default function ChoisirSouper({ recettes, onChoisir, onAnnuler }: Props) {
+  const keyboardOffset = useKeyboardOffset()
   const [onglet, setOnglet] = useState<'recettes' | 'libre'>('recettes')
   const [recherche, setRecherche] = useState('')
   const [nomLibre, setNomLibre] = useState('')
@@ -88,7 +90,7 @@ export default function ChoisirSouper({ recettes, onChoisir, onAnnuler }: Props)
           </div>
         </div>
       ) : (
-        <div className="flex-1 p-4 flex flex-col gap-4">
+        <div className="flex-1 p-4 flex flex-col gap-4" style={{ paddingBottom: `max(16px, ${keyboardOffset}px)` }}>
           <input
             type="text"
             value={nomLibre}

@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, ChevronRight, ShoppingBag, X } from 'lucide-react'
 import type { Epicerie, Liste } from '../../types'
+import { useKeyboardOffset } from '../../hooks/useKeyboardOffset'
 
 interface Props {
   epiceries: Epicerie[]
@@ -13,6 +14,7 @@ interface Props {
 
 export default function EpiceriesView({ epiceries, listes, onCreerListe, onAjouterEpicerie }: Props) {
   const navigate = useNavigate()
+  const keyboardOffset = useKeyboardOffset()
   const [showModal, setShowModal] = useState(false)
   const [modalEpicerie, setModalEpicerie] = useState<Epicerie | null>(null)
   const [nomListe, setNomListe] = useState('')
@@ -107,7 +109,7 @@ export default function EpiceriesView({ epiceries, listes, onCreerListe, onAjout
       {/* Modal nouvelle liste */}
       {showModal && modalEpicerie && (
         <div className="fixed inset-0 z-50 flex items-end bg-black/40" onClick={() => setShowModal(false)}>
-          <div className="bg-white w-full rounded-t-3xl p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white w-full rounded-t-3xl p-6" style={{ paddingBottom: `max(24px, ${keyboardOffset}px)` }} onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-bold mb-1">Nouvelle liste</h3>
             <p className="text-sm text-gray-400 mb-4">{modalEpicerie.nom}</p>
             <input
@@ -134,7 +136,7 @@ export default function EpiceriesView({ epiceries, listes, onCreerListe, onAjout
       {/* Modal nouvelle épicerie */}
       {showNouvelleEpicerie && (
         <div className="fixed inset-0 z-50 flex items-end bg-black/40" onClick={() => setShowNouvelleEpicerie(false)}>
-          <div className="bg-white w-full rounded-t-3xl p-6" onClick={(e) => e.stopPropagation()}>
+          <div className="bg-white w-full rounded-t-3xl p-6" style={{ paddingBottom: `max(24px, ${keyboardOffset}px)` }} onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold">Ajouter un magasin</h3>
               <button onClick={() => setShowNouvelleEpicerie(false)}><X size={20} className="text-gray-400" /></button>
