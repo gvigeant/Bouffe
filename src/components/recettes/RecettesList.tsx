@@ -35,7 +35,7 @@ export default function RecettesList({ recettes, onAjouter }: Props) {
   return (
     <div className="flex flex-col h-full bg-gray-50">
       {/* Header */}
-      <div className="bg-white px-4 pt-4 pb-3 shadow-sm sticky top-0 z-10">
+      <div className="bg-white px-4 pt-safe pb-3 shadow-sm sticky top-0 z-10">
         <h1 className="text-2xl font-bold text-gray-900 mb-3">Recettes</h1>
         <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />

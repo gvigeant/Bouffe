@@ -44,7 +44,7 @@ export default function EpiceriesView({ epiceries, listes, onCreerListe, onAjout
 
   return (
     <div className="flex flex-col h-full bg-gray-50">
-      <div className="bg-white px-4 pt-4 pb-3 shadow-sm sticky top-0 z-10">
+      <div className="bg-white px-4 pt-safe pb-3 shadow-sm sticky top-0 z-10">
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">Épicerie</h1>
           <button onClick={() => setShowNouvelleEpicerie(true)} className="text-orange-500">

@@ -50,7 +50,7 @@ export default function PlanSemaineView({
   return (
     <div className="flex flex-col h-full bg-gray-50">
       {/* Header */}
-      <div className="bg-white px-4 pt-4 pb-3 shadow-sm sticky top-0 z-10">
+      <div className="bg-white px-4 pt-safe pb-3 shadow-sm sticky top-0 z-10">
         <h1 className="text-2xl font-bold text-gray-900 mb-3">Plan de soupers</h1>
         <div className="flex items-center justify-between">
           <button onClick={onSemainePrecedente} className="p-2 rounded-full bg-gray-100">

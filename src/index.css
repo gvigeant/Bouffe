@@ -36,6 +36,10 @@ html, body {
   padding-top: env(safe-area-inset-top, 0px);
 }
 
+.pt-safe {
+  padding-top: max(16px, env(safe-area-inset-top, 16px));
+}
+
 input, textarea, select {
   -webkit-appearance: none;
   appearance: none;
