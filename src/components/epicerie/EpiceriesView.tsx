@@ -2,7 +2,6 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, ChevronRight, ShoppingBag, X } from 'lucide-react'
 import type { Epicerie, Liste } from '../../types'
-import { useVisualViewport } from '../../hooks/useVisualViewport'
 
 interface Props {
   epiceries: Epicerie[]
@@ -14,8 +13,6 @@ interface Props {
 
 export default function EpiceriesView({ epiceries, listes, onCreerListe, onAjouterEpicerie }: Props) {
   const navigate = useNavigate()
-  const { height: vvHeight, offsetTop: vvOffsetTop } = useVisualViewport()
-  const overlayStyle = { top: vvOffsetTop, height: vvHeight }
   const [showModal, setShowModal] = useState(false)
   const [modalEpicerie, setModalEpicerie] = useState<Epicerie | null>(null)
   const [nomListe, setNomListe] = useState('')
@@ -107,16 +104,24 @@ export default function EpiceriesView({ epiceries, listes, onCreerListe, onAjout
         })}
       </div>
 
-      {/* Modal nouvelle liste */}
+      {/* Page nouvelle liste */}
       {showModal && modalEpicerie && (
-        <div
-          className="fixed left-0 right-0 z-[60] flex items-end bg-black/40"
-          style={overlayStyle}
-          onClick={() => setShowModal(false)}
-        >
-          <div className="bg-white w-full rounded-t-3xl p-6" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-bold mb-1">Nouvelle liste</h3>
-            <p className="text-sm text-gray-400 mb-4">{modalEpicerie.nom}</p>
+        <div className="fixed inset-0 z-[60] bg-gray-50 flex flex-col">
+          <div className="bg-white flex items-center justify-between px-4 pt-safe pb-3 border-b border-gray-100">
+            <button onClick={() => setShowModal(false)} className="p-1">
+              <X size={22} className="text-gray-500" />
+            </button>
+            <h2 className="font-bold text-base">Nouvelle liste</h2>
+            <button
+              onClick={creer}
+              disabled={!nomListe.trim()}
+              className="bg-orange-500 text-white text-sm font-semibold px-4 py-1.5 rounded-full disabled:opacity-40"
+            >
+              Créer
+            </button>
+          </div>
+          <div className="p-4">
+            <p className="text-xs text-gray-400 uppercase tracking-wide mb-2">{modalEpicerie.nom}</p>
             <input
               type="text"
               value={nomListe}
@@ -124,32 +129,29 @@ export default function EpiceriesView({ epiceries, listes, onCreerListe, onAjout
               placeholder="Ex: Semaine du 3 juin"
               autoFocus
               onKeyDown={(e) => e.key === 'Enter' && creer()}
-              className="w-full bg-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-400 mb-4"
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-400"
             />
-            <div className="flex gap-3">
-              <button onClick={() => setShowModal(false)} className="flex-1 py-3 bg-gray-100 rounded-2xl text-gray-700 font-semibold">
-                Annuler
-              </button>
-              <button onClick={creer} className="flex-1 py-3 bg-orange-500 rounded-2xl text-white font-semibold">
-                Créer
-              </button>
-            </div>
           </div>
         </div>
       )}
 
-      {/* Modal nouvelle épicerie */}
+      {/* Page nouvelle épicerie */}
       {showNouvelleEpicerie && (
-        <div
-          className="fixed left-0 right-0 z-[60] flex items-end bg-black/40"
-          style={overlayStyle}
-          onClick={() => setShowNouvelleEpicerie(false)}
-        >
-          <div className="bg-white w-full rounded-t-3xl p-6" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-bold">Ajouter un magasin</h3>
-              <button onClick={() => setShowNouvelleEpicerie(false)}><X size={20} className="text-gray-400" /></button>
-            </div>
+        <div className="fixed inset-0 z-[60] bg-gray-50 flex flex-col">
+          <div className="bg-white flex items-center justify-between px-4 pt-safe pb-3 border-b border-gray-100">
+            <button onClick={() => setShowNouvelleEpicerie(false)} className="p-1">
+              <X size={22} className="text-gray-500" />
+            </button>
+            <h2 className="font-bold text-base">Ajouter un magasin</h2>
+            <button
+              onClick={ajouterEpicerie}
+              disabled={!nomEpicerie.trim()}
+              className="bg-orange-500 text-white text-sm font-semibold px-4 py-1.5 rounded-full disabled:opacity-40"
+            >
+              Ajouter
+            </button>
+          </div>
+          <div className="p-4">
             <input
               type="text"
               value={nomEpicerie}
@@ -157,11 +159,8 @@ export default function EpiceriesView({ epiceries, listes, onCreerListe, onAjout
               placeholder="Nom du magasin"
               autoFocus
               onKeyDown={(e) => e.key === 'Enter' && ajouterEpicerie()}
-              className="w-full bg-gray-100 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-400 mb-4"
+              className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-sm outline-none focus:ring-2 focus:ring-orange-400"
             />
-            <button onClick={ajouterEpicerie} className="w-full py-3 bg-orange-500 rounded-2xl text-white font-semibold">
-              Ajouter
-            </button>
           </div>
         </div>
       )}
