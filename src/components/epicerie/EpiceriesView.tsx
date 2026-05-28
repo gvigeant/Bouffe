@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Plus, ChevronRight, ShoppingBag, X } from 'lucide-react'
 import type { Epicerie, Liste } from '../../types'
-import { useKeyboardOffset } from '../../hooks/useKeyboardOffset'
+import { useVisualViewport } from '../../hooks/useVisualViewport'
 
 interface Props {
   epiceries: Epicerie[]
@@ -14,7 +14,8 @@ interface Props {
 
 export default function EpiceriesView({ epiceries, listes, onCreerListe, onAjouterEpicerie }: Props) {
   const navigate = useNavigate()
-  const keyboardOffset = useKeyboardOffset()
+  const { height: vvHeight, offsetTop: vvOffsetTop } = useVisualViewport()
+  const overlayStyle = { top: vvOffsetTop, height: vvHeight }
   const [showModal, setShowModal] = useState(false)
   const [modalEpicerie, setModalEpicerie] = useState<Epicerie | null>(null)
   const [nomListe, setNomListe] = useState('')
@@ -108,8 +109,12 @@ export default function EpiceriesView({ epiceries, listes, onCreerListe, onAjout
 
       {/* Modal nouvelle liste */}
       {showModal && modalEpicerie && (
-        <div className="fixed inset-0 z-[60] flex items-end bg-black/40" onClick={() => setShowModal(false)}>
-          <div className="bg-white w-full rounded-t-3xl p-6" style={{ transform: `translateY(-${keyboardOffset}px)`, transition: 'transform 0.25s ease-out' }} onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed left-0 right-0 z-[60] flex items-end bg-black/40"
+          style={overlayStyle}
+          onClick={() => setShowModal(false)}
+        >
+          <div className="bg-white w-full rounded-t-3xl p-6" onClick={(e) => e.stopPropagation()}>
             <h3 className="text-lg font-bold mb-1">Nouvelle liste</h3>
             <p className="text-sm text-gray-400 mb-4">{modalEpicerie.nom}</p>
             <input
@@ -135,8 +140,12 @@ export default function EpiceriesView({ epiceries, listes, onCreerListe, onAjout
 
       {/* Modal nouvelle épicerie */}
       {showNouvelleEpicerie && (
-        <div className="fixed inset-0 z-[60] flex items-end bg-black/40" onClick={() => setShowNouvelleEpicerie(false)}>
-          <div className="bg-white w-full rounded-t-3xl p-6" style={{ transform: `translateY(-${keyboardOffset}px)`, transition: 'transform 0.25s ease-out' }} onClick={(e) => e.stopPropagation()}>
+        <div
+          className="fixed left-0 right-0 z-[60] flex items-end bg-black/40"
+          style={overlayStyle}
+          onClick={() => setShowNouvelleEpicerie(false)}
+        >
+          <div className="bg-white w-full rounded-t-3xl p-6" onClick={(e) => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-bold">Ajouter un magasin</h3>
               <button onClick={() => setShowNouvelleEpicerie(false)}><X size={20} className="text-gray-400" /></button>
