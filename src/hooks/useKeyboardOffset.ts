@@ -8,16 +8,12 @@ export function useKeyboardOffset() {
     if (!viewport) return
 
     const handler = () => {
-      const kb = window.innerHeight - viewport.height - viewport.offsetTop
+      const kb = window.innerHeight - viewport.height
       setOffset(kb > 0 ? kb : 0)
     }
 
     viewport.addEventListener('resize', handler)
-    viewport.addEventListener('scroll', handler)
-    return () => {
-      viewport.removeEventListener('resize', handler)
-      viewport.removeEventListener('scroll', handler)
-    }
+    return () => viewport.removeEventListener('resize', handler)
   }, [])
 
   return offset

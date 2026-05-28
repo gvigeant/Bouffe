@@ -90,7 +90,7 @@ export default function ChoisirSouper({ recettes, onChoisir, onAnnuler }: Props)
           </div>
         </div>
       ) : (
-        <div className="flex-1 p-4 flex flex-col gap-4" style={{ paddingBottom: `max(16px, ${keyboardOffset}px)` }}>
+        <div className="flex-1 p-4 flex flex-col gap-4" style={{ paddingBottom: Math.max(16, keyboardOffset) }}>
           <input
             type="text"
             value={nomLibre}
