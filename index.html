@@ -1,19 +1,710 @@
 <!doctype html>
 <html lang="fr">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
-    <meta name="theme-color" content="#F97316" />
-    <meta name="apple-mobile-web-app-capable" content="yes" />
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="Bouffe" />
-    <link rel="icon" type="image/svg+xml" href="/Bouffe/favicon.svg" />
-    <link rel="apple-touch-icon" href="/Bouffe/apple-touch-icon.png" />
-    <link rel="manifest" href="/Bouffe/manifest.json" />
-    <title>Bouffe</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+<meta name="theme-color" content="#F97316" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Bouffe" />
+<link rel="icon" type="image/svg+xml" href="favicon.svg" />
+<link rel="apple-touch-icon" href="apple-touch-icon.png" />
+<link rel="manifest" href="manifest.json" />
+<title>Bouffe</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --orange:#F97316;--orange-dark:#EA580C;--orange-light:#FFF4ED;
+  --gray-50:#F5F5F7;--gray-100:#F2F4F9;--gray-200:#E5E7EB;--gray-300:#D1D5DB;--gray-400:#9CA3AF;--gray-500:#6B7280;--gray-700:#374151;--gray-900:#111827;
+  --red:#DC2626;--red-bg:#FEF2F2;--green:#16A34A;
+  --r:14px;--r-sm:10px;
+  --nav-h:64px;--hdr-h:54px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
+}
+html,body{height:100%;overflow:hidden;background:var(--gray-50);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--gray-900);font-size:16px;-webkit-font-smoothing:antialiased}
+input,textarea,select,button{font-family:inherit;font-size:16px;color:inherit}
+button{cursor:pointer;border:none;background:none}
+
+/* Login */
+#login{position:fixed;inset:0;display:none;flex-direction:column;justify-content:center;padding:24px;background:#fff;z-index:300}
+#login.show{display:flex}
+#login h1{font-size:32px;font-weight:700;margin-bottom:6px;text-align:center;color:var(--orange)}
+#login .sub{font-size:14px;color:var(--gray-500);text-align:center;margin-bottom:32px}
+#login input{width:100%;padding:14px 16px;border:1.5px solid var(--gray-200);border-radius:var(--r-sm);background:#fff;outline:none;margin-bottom:12px;transition:border-color .15s}
+#login input:focus{border-color:var(--orange)}
+#login button{width:100%;padding:14px;border-radius:var(--r-sm);background:var(--orange);color:#fff;font-weight:600;margin-top:8px}
+#login button:active{background:var(--orange-dark)}
+#login .err{color:var(--red);font-size:13px;text-align:center;margin-top:10px;min-height:18px}
+
+/* Main shell */
+#app{display:none;flex-direction:column;height:100%}
+#app.show{display:flex}
+#hdr{height:calc(var(--hdr-h) + env(safe-area-inset-top));padding-top:env(safe-area-inset-top);background:#fff;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;padding-left:18px;padding-right:18px;flex-shrink:0;z-index:10}
+#hdr h1{font-size:20px;font-weight:700;color:var(--orange)}
+#hdr h1 .emoji{margin-right:6px}
+
+/* Screens */
+.screen{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;display:none;padding:14px 14px calc(var(--nav-h) + 14px + env(safe-area-inset-bottom))}
+.screen.active{display:block}
+
+/* Card */
+.card{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);padding:14px;margin-bottom:12px}
+.card-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;color:var(--gray-500);margin-bottom:12px}
+
+/* Inputs */
+.field{margin-bottom:10px}
+.field:last-child{margin-bottom:0}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--gray-700);margin-bottom:5px}
+input[type=text],input[type=email],input[type=password],input[type=number],textarea,select{width:100%;padding:12px 14px;border:1.5px solid var(--gray-200);border-radius:var(--r-sm);background:#fff;outline:none;transition:border-color .15s}
+input:focus,textarea:focus,select:focus{border-color:var(--orange)}
+input[type=checkbox]{accent-color:var(--orange);width:22px;height:22px;cursor:pointer}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;padding:12px 16px;border-radius:var(--r-sm);font-weight:600;min-height:46px;width:100%}
+.btn:active{transform:scale(.98)}
+.btn-primary{background:var(--orange);color:#fff}
+.btn-primary:disabled{background:#f3c5a3;color:#fff}
+.btn-outline{background:#fff;color:var(--gray-700);border:1.5px solid var(--gray-200)}
+.btn-danger{background:var(--red-bg);color:var(--red)}
+.btn-icon{width:40px;height:40px;min-height:auto;padding:0;flex-shrink:0;border-radius:8px}
+
+/* Inline form (no modal — sits inline) */
+.inline-form{display:flex;gap:8px;align-items:stretch}
+.inline-form input{flex:1}
+.inline-form .btn{width:46px;min-height:46px;padding:0}
+
+/* Magasin block */
+.magasin{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:10px;overflow:hidden}
+.magasin-hdr{padding:12px 14px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--gray-100)}
+.magasin-hdr .nom{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px}
+.magasin-hdr .nom svg{width:18px;height:18px;color:var(--orange)}
+.magasin-actions{display:flex;gap:4px}
+.magasin-actions button{padding:6px;color:var(--gray-400);border-radius:6px}
+.magasin-actions button:active{background:var(--gray-100)}
+.magasin-listes{padding:0}
+.liste-row{width:100%;display:flex;align-items:center;justify-content:space-between;padding:12px 14px;border-bottom:1px solid var(--gray-100);text-align:left;background:#fff}
+.liste-row:last-child{border-bottom:none}
+.liste-row:active{background:var(--gray-50)}
+.liste-row .info{flex:1;min-width:0}
+.liste-row .nom{font-size:14px;font-weight:500;color:var(--gray-900)}
+.liste-row .meta{font-size:11px;color:var(--gray-400);margin-top:2px}
+.liste-row .right{display:flex;align-items:center;gap:8px}
+.liste-row .badge{background:var(--orange);color:#fff;font-size:11px;font-weight:700;padding:2px 8px;border-radius:99px;min-width:22px;text-align:center}
+.liste-row .chev{color:var(--gray-300)}
+.liste-add{padding:8px 14px 12px;background:var(--orange-light)}
+
+.empty{text-align:center;padding:32px 16px;color:var(--gray-400);font-size:14px}
+.empty .ico{font-size:38px;margin-bottom:10px}
+
+/* Article */
+.article{display:flex;align-items:center;gap:12px;padding:12px 14px;background:#fff;border-bottom:1px solid var(--gray-100)}
+.article:last-child{border-bottom:none}
+.article.coche .article-nom{text-decoration:line-through;color:var(--gray-400)}
+.article-info{flex:1;min-width:0;display:flex;align-items:baseline;gap:8px;flex-wrap:wrap}
+.article-nom{font-size:15px;font-weight:500}
+.article-qte{font-size:13px;color:var(--gray-500);font-variant-numeric:tabular-nums}
+.article-del{color:var(--gray-300);padding:6px;border-radius:6px}
+.article-del:active{background:var(--red-bg);color:var(--red)}
+
+/* Plan jour */
+.jour{background:#fff;border-radius:var(--r);box-shadow:var(--shadow);margin-bottom:10px;padding:12px 14px}
+.jour-hdr{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.jour-jour{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--orange)}
+.jour-date{font-size:12px;color:var(--gray-400);font-variant-numeric:tabular-nums}
+.jour-input{display:flex;gap:8px;align-items:center}
+.jour-input input{flex:1;padding:10px 12px;font-size:14px}
+.jour-input .btn-clear{color:var(--gray-300);padding:4px;border-radius:6px}
+.jour-input .btn-clear:active{background:var(--gray-100);color:var(--red)}
+
+/* Plan header (week nav) */
+.weeknav{display:flex;align-items:center;justify-content:space-between;background:#fff;border-radius:var(--r);box-shadow:var(--shadow);padding:10px 12px;margin-bottom:14px}
+.weeknav button{padding:8px;color:var(--orange);border-radius:8px}
+.weeknav button:active{background:var(--orange-light)}
+.weeknav .label{flex:1;text-align:center;font-size:13px;font-weight:600;color:var(--gray-700)}
+
+/* Detail page (full screen) */
+.detail{position:fixed;inset:0;background:var(--gray-50);z-index:50;display:none;flex-direction:column}
+.detail.show{display:flex}
+.detail-hdr{background:#fff;border-bottom:1px solid var(--gray-200);display:flex;align-items:center;padding:env(safe-area-inset-top) 12px 0;gap:10px;flex-shrink:0;min-height:calc(var(--hdr-h) + env(safe-area-inset-top))}
+.detail-hdr-inner{display:flex;align-items:center;gap:10px;width:100%;padding:8px 0}
+.detail-hdr .back{padding:8px;color:var(--gray-500);border-radius:8px}
+.detail-hdr .titre{flex:1;min-width:0}
+.detail-hdr .titre h2{font-size:16px;font-weight:700;color:var(--gray-900);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.detail-hdr .titre .sub{font-size:11px;color:var(--gray-400);margin-top:1px}
+.detail-hdr .trash{padding:8px;color:var(--gray-400);border-radius:8px}
+.detail-hdr .trash:active{color:var(--red);background:var(--red-bg)}
+.detail-body{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch}
+
+/* Add article inline bar (top of detail) */
+.add-article{background:#fff;border-bottom:1px solid var(--gray-200);padding:10px 12px}
+.add-article-row{display:flex;gap:6px}
+.add-article-row input[type=text]{padding:10px 12px;font-size:14px}
+.add-article-row .qte{width:60px;text-align:center;padding-left:6px;padding-right:6px;flex-shrink:0}
+.add-article-row .nom{flex:1;min-width:0}
+.add-article-row .btn{width:44px;min-height:44px;padding:0;flex-shrink:0}
+
+/* Bottom nav */
+#nav{position:fixed;bottom:0;left:0;right:0;height:calc(var(--nav-h) + env(safe-area-inset-bottom));padding-bottom:env(safe-area-inset-bottom);background:#fff;border-top:1px solid var(--gray-200);display:flex;z-index:5}
+.nb{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;color:var(--gray-400);font-size:11px;font-weight:500}
+.nb svg{width:24px;height:24px;transition:transform .15s}
+.nb.active{color:var(--orange)}
+.nb.active svg{transform:scale(1.1)}
+
+/* Toast */
+#toast{position:fixed;bottom:calc(var(--nav-h) + 12px + env(safe-area-inset-bottom));left:14px;right:14px;padding:12px 16px;border-radius:12px;font-size:14px;font-weight:500;color:#fff;opacity:0;transform:translateY(10px);transition:opacity .2s,transform .2s;pointer-events:none;z-index:400;text-align:center;box-shadow:0 4px 14px rgba(0,0,0,.18)}
+#toast.show{opacity:1;transform:translateY(0)}
+#toast.success{background:var(--green)}
+#toast.error{background:var(--red)}
+#toast.warn{background:#D97706}
+
+/* Loading */
+#loading{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:var(--gray-50);z-index:500;color:var(--gray-400);font-size:14px}
+#loading.hide{display:none}
+</style>
+</head>
+<body>
+
+<div id="loading">Chargement…</div>
+
+<form id="login" onsubmit="return doLogin(event)">
+  <h1>🍽 Bouffe</h1>
+  <p class="sub">Connecte-toi pour continuer</p>
+  <input type="email" id="login-email" placeholder="Courriel" autocomplete="email" required />
+  <input type="password" id="login-pw" placeholder="Mot de passe" autocomplete="current-password" required />
+  <button type="submit" id="login-btn">Se connecter</button>
+  <p class="err" id="login-err"></p>
+</form>
+
+<div id="app">
+  <div id="hdr">
+    <h1><span class="emoji">🍽</span>Bouffe</h1>
+  </div>
+
+  <div class="screen active" id="s-epicerie">
+    <div class="card">
+      <div class="card-title">Nouveau magasin</div>
+      <div class="inline-form">
+        <input type="text" id="new-magasin" placeholder="Ex : IGA" />
+        <button class="btn btn-primary" onclick="ajouterMagasin()" aria-label="Ajouter magasin">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div id="magasins-list"></div>
+  </div>
+
+  <div class="screen" id="s-plan">
+    <div class="weeknav">
+      <button onclick="changeSemaine(-1)" aria-label="Semaine précédente">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22"><polyline points="15 18 9 12 15 6"/></svg>
+      </button>
+      <span class="label" id="week-label"></span>
+      <button onclick="changeSemaine(1)" aria-label="Semaine suivante">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22"><polyline points="9 18 15 12 9 6"/></svg>
+      </button>
+    </div>
+    <div id="plan-list"></div>
+  </div>
+
+  <div class="screen" id="s-params">
+    <div class="card">
+      <div class="card-title">Compte</div>
+      <p style="font-size:14px;color:var(--gray-500);margin-bottom:14px"><strong id="user-email" style="color:var(--gray-900)"></strong></p>
+      <button class="btn btn-outline" onclick="doLogout()">Se déconnecter</button>
+    </div>
+    <div class="card">
+      <div class="card-title">À propos</div>
+      <p style="font-size:13px;color:var(--gray-500);line-height:1.6">Bouffe — Épicerie et plan de soupers, partagé entre deux iPhones via Firebase.</p>
+    </div>
+  </div>
+
+  <div class="detail" id="liste-detail">
+    <div class="detail-hdr">
+      <div class="detail-hdr-inner">
+        <button class="back" onclick="fermerListe()" aria-label="Retour">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="22" height="22"><polyline points="15 18 9 12 15 6"/></svg>
+        </button>
+        <div class="titre"><h2 id="liste-titre"></h2><div class="sub" id="liste-sub"></div></div>
+        <button class="trash" onclick="supprimerListe()" aria-label="Supprimer">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="add-article">
+      <div class="add-article-row">
+        <input type="text" class="qte" id="new-article-qte" placeholder="Qté" />
+        <input type="text" class="nom" id="new-article-nom" placeholder="Article…" />
+        <button class="btn btn-primary" onclick="ajouterArticle()" aria-label="Ajouter article">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        </button>
+      </div>
+    </div>
+    <div class="detail-body" id="articles-body"></div>
+  </div>
+
+  <nav id="nav">
+    <button class="nb active" data-tab="epicerie" onclick="goTo('epicerie')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6"/></svg>
+      Épicerie
+    </button>
+    <button class="nb" data-tab="plan" onclick="goTo('plan')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+      Plan
+    </button>
+    <button class="nb" data-tab="params" onclick="goTo('params')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Paramètres
+    </button>
+  </nav>
+</div>
+
+<div id="toast"></div>
+
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey: "AIzaSyBd1JJQ775rGybW-tBNcd88qH1WB4j4Ges",
+  authDomain: "bouffe-c0ff9.firebaseapp.com",
+  projectId: "bouffe-c0ff9",
+  storageBucket: "bouffe-c0ff9.firebasestorage.app",
+  messagingSenderId: "672908027706",
+  appId: "1:672908027706:web:2b190a2254054e1c8ed203"
+});
+const auth = firebase.auth();
+const db = firebase.firestore();
+
+let magasins = [];
+let listes = [];
+let plan = [];
+let listeOuverte = null;
+let lundiCourant = lundiDeISO(new Date());
+let unsubMagasins = null, unsubListes = null, unsubPlan = null;
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+const escAttr = (s) => esc(s).replace(/'/g, "&#39;");
+
+let _toastTimer;
+function toast(msg, type) {
+  type = type || "success";
+  const el = $("toast");
+  el.textContent = msg;
+  el.className = "show " + type;
+  clearTimeout(_toastTimer);
+  _toastTimer = setTimeout(() => { el.className = ""; }, 2800);
+}
+
+auth.onAuthStateChanged((user) => {
+  $("loading").classList.add("hide");
+  if (user) {
+    $("login").classList.remove("show");
+    $("app").classList.add("show");
+    $("user-email").textContent = user.email || "";
+    abonnerDonnees();
+  } else {
+    $("app").classList.remove("show");
+    $("login").classList.add("show");
+    desabonnerDonnees();
+  }
+});
+
+function doLogin(e) {
+  e.preventDefault();
+  const email = $("login-email").value.trim();
+  const pw = $("login-pw").value;
+  $("login-err").textContent = "";
+  $("login-btn").disabled = true;
+  auth.signInWithEmailAndPassword(email, pw)
+    .catch((err) => { $("login-err").textContent = "Connexion échouée : " + (err.message || err.code); })
+    .finally(() => { $("login-btn").disabled = false; });
+  return false;
+}
+
+function doLogout() {
+  if (!confirm("Se déconnecter ?")) return;
+  auth.signOut();
+}
+
+function abonnerDonnees() {
+  desabonnerDonnees();
+  unsubMagasins = db.collection("epiceries").orderBy("ordre").onSnapshot(async (snap) => {
+    if (snap.empty) {
+      const predef = ["IGA", "Maxi", "Costco", "Metro"];
+      for (let i = 0; i < predef.length; i++) {
+        await db.collection("epiceries").add({ nom: predef[i], ordre: i });
+      }
+      return;
+    }
+    magasins = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    renderMagasins();
+  }, (e) => toast("Erreur magasins : " + e.message, "error"));
+
+  unsubListes = db.collection("listes").orderBy("dateCreation", "desc").onSnapshot((snap) => {
+    listes = snap.docs.map((d) => ({ id: d.id, ...d.data(), articles: d.data().articles || [] }));
+    renderMagasins();
+    if (listeOuverte) {
+      const liste = listes.find((l) => l.id === listeOuverte);
+      if (liste) renderArticles(liste);
+      else fermerListe();
+    }
+  }, (e) => toast("Erreur listes : " + e.message, "error"));
+
+  unsubPlan = db.collection("planSemaine").onSnapshot((snap) => {
+    plan = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    renderPlan();
+  }, (e) => toast("Erreur plan : " + e.message, "error"));
+}
+
+function desabonnerDonnees() {
+  if (unsubMagasins) { unsubMagasins(); unsubMagasins = null; }
+  if (unsubListes) { unsubListes(); unsubListes = null; }
+  if (unsubPlan) { unsubPlan(); unsubPlan = null; }
+  magasins = []; listes = []; plan = [];
+}
+
+function goTo(tab) {
+  document.querySelectorAll(".screen").forEach((s) => s.classList.remove("active"));
+  document.querySelectorAll(".nb").forEach((b) => b.classList.remove("active"));
+  $("s-" + tab).classList.add("active");
+  document.querySelector(`.nb[data-tab="${tab}"]`).classList.add("active");
+  if (tab === "plan") renderPlan();
+}
+
+function renderMagasins() {
+  const root = $("magasins-list");
+  if (magasins.length === 0) {
+    root.innerHTML = '<div class="empty"><div class="ico">🛒</div>Aucun magasin.</div>';
+    return;
+  }
+  let html = "";
+  magasins.forEach((m) => {
+    const ses = listes.filter((l) => l.epicerieId === m.id);
+    html += `<div class="magasin">
+      <div class="magasin-hdr">
+        <span class="nom"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.7 13.4a2 2 0 002 1.6h9.7a2 2 0 002-1.6L23 6H6"/></svg>${esc(m.nom)}</span>
+        <div class="magasin-actions">
+          <button data-action="del-magasin" data-id="${escAttr(m.id)}" data-nom="${escAttr(m.nom)}" aria-label="Supprimer magasin">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="magasin-listes">`;
+    if (ses.length === 0) {
+      html += '<div style="padding:14px;text-align:center;font-size:12px;color:var(--gray-400)">Aucune liste</div>';
+    } else {
+      ses.forEach((l) => {
+        const restants = (l.articles || []).filter((a) => !a.estCoche).length;
+        const total = (l.articles || []).length;
+        html += `<button class="liste-row" data-action="open-liste" data-id="${escAttr(l.id)}">
+          <div class="info">
+            <div class="nom">${esc(l.nom)}</div>
+            <div class="meta">${total} article${total > 1 ? "s" : ""}</div>
+          </div>
+          <div class="right">
+            ${restants > 0 ? `<span class="badge">${restants}</span>` : ""}
+            <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </button>`;
+      });
+    }
+    html += `</div>
+      <div class="liste-add">
+        <div class="inline-form">
+          <input type="text" placeholder="Nouvelle liste…" data-magasin-id="${escAttr(m.id)}" data-magasin-nom="${escAttr(m.nom)}" class="nl-input" />
+          <button class="btn btn-primary" data-action="creer-liste" data-id="${escAttr(m.id)}" data-nom="${escAttr(m.nom)}" aria-label="Créer liste">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="20" height="20"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          </button>
+        </div>
+      </div>
+    </div>`;
+  });
+  root.innerHTML = html;
+}
+
+$("magasins-list").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-action]");
+  if (!btn) return;
+  const action = btn.dataset.action;
+  if (action === "del-magasin") supprimerMagasin(btn.dataset.id, btn.dataset.nom);
+  else if (action === "open-liste") ouvrirListe(btn.dataset.id);
+  else if (action === "creer-liste") creerListe(btn.dataset.id, btn.dataset.nom);
+});
+
+$("magasins-list").addEventListener("keydown", (e) => {
+  if (e.key !== "Enter") return;
+  const inp = e.target;
+  if (!inp.classList || !inp.classList.contains("nl-input")) return;
+  e.preventDefault();
+  creerListe(inp.dataset.magasinId, inp.dataset.magasinNom);
+});
+
+async function ajouterMagasin() {
+  const inp = $("new-magasin");
+  const nom = inp.value.trim();
+  if (!nom) return toast("Saisis un nom.", "warn");
+  if (magasins.some((m) => m.nom.toLowerCase() === nom.toLowerCase())) return toast("Magasin déjà existant.", "warn");
+  try {
+    await db.collection("epiceries").add({ nom, ordre: magasins.length });
+    inp.value = "";
+    toast("Magasin ajouté.");
+  } catch (e) {
+    toast("Erreur : " + e.message, "error");
+  }
+}
+
+async function supprimerMagasin(id, nom) {
+  if (!confirm(`Supprimer "${nom}" ? Les listes associées resteront mais sans magasin.`)) return;
+  try {
+    await db.collection("epiceries").doc(id).delete();
+  } catch (e) {
+    toast("Erreur : " + e.message, "error");
+  }
+}
+
+async function creerListe(epicerieId, epicerieNom) {
+  const inp = document.querySelector(`.nl-input[data-magasin-id="${epicerieId}"]`);
+  if (!inp) return;
+  const nom = inp.value.trim();
+  if (!nom) return toast("Saisis un nom.", "warn");
+  try {
+    const ref = await db.collection("listes").add({
+      epicerieId, epicerieNom, nom,
+      dateCreation: firebase.firestore.FieldValue.serverTimestamp(),
+      articles: [],
+    });
+    inp.value = "";
+    ouvrirListe(ref.id);
+  } catch (e) {
+    toast("Erreur : " + e.message, "error");
+  }
+}
+
+function ouvrirListe(id) {
+  const liste = listes.find((l) => l.id === id);
+  if (!liste) return;
+  listeOuverte = id;
+  $("liste-titre").textContent = liste.nom;
+  $("liste-sub").textContent = liste.epicerieNom || "";
+  renderArticles(liste);
+  $("liste-detail").classList.add("show");
+}
+
+function fermerListe() {
+  listeOuverte = null;
+  $("liste-detail").classList.remove("show");
+  $("new-article-qte").value = "";
+  $("new-article-nom").value = "";
+}
+
+async function supprimerListe() {
+  if (!listeOuverte) return;
+  const liste = listes.find((l) => l.id === listeOuverte);
+  if (!liste) return;
+  if (!confirm(`Supprimer la liste "${liste.nom}" ?`)) return;
+  try {
+    await db.collection("listes").doc(listeOuverte).delete();
+    fermerListe();
+  } catch (e) {
+    toast("Erreur : " + e.message, "error");
+  }
+}
+
+function renderArticles(liste) {
+  const root = $("articles-body");
+  const arts = (liste.articles || []).slice().sort((a, b) => {
+    if (a.estCoche !== b.estCoche) return a.estCoche ? 1 : -1;
+    return (a.ordre || 0) - (b.ordre || 0);
+  });
+  if (arts.length === 0) {
+    root.innerHTML = '<div class="empty"><div class="ico">📋</div>Liste vide.<br>Ajoute un article ci-dessus.</div>';
+    return;
+  }
+  let html = "";
+  arts.forEach((a) => {
+    const qte = [a.quantite, a.unite].filter(Boolean).join(" ").trim();
+    html += `<label class="article ${a.estCoche ? "coche" : ""}">
+      <input type="checkbox" ${a.estCoche ? "checked" : ""} data-art-id="${escAttr(a.id)}" />
+      <div class="article-info">
+        <span class="article-nom">${esc(a.nom)}</span>
+        ${qte ? `<span class="article-qte">${esc(qte)}</span>` : ""}
+      </div>
+      <button class="article-del" type="button" data-del-art="${escAttr(a.id)}" aria-label="Supprimer">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="18" height="18"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>
+      </button>
+    </label>`;
+  });
+  root.innerHTML = html;
+}
+
+$("articles-body").addEventListener("click", (e) => {
+  const del = e.target.closest("[data-del-art]");
+  if (del) {
+    e.preventDefault();
+    supprimerArticle(del.dataset.delArt);
+  }
+});
+
+$("articles-body").addEventListener("change", (e) => {
+  const cb = e.target;
+  if (cb.dataset && cb.dataset.artId) {
+    toggleArticle(cb.dataset.artId, cb.checked);
+  }
+});
+
+async function ajouterArticle() {
+  if (!listeOuverte) return;
+  const nomInp = $("new-article-nom");
+  const qteInp = $("new-article-qte");
+  const nom = nomInp.value.trim();
+  if (!nom) return toast("Saisis un article.", "warn");
+  const qteRaw = qteInp.value.trim();
+  const m = qteRaw.match(/^(\d+(?:[.,]\d+)?)\s*(.*)$/);
+  const quantite = m ? m[1].replace(",", ".") : "";
+  const unite = m ? m[2].trim() : qteRaw;
+  const liste = listes.find((l) => l.id === listeOuverte);
+  if (!liste) return;
+  const article = {
+    id: (crypto.randomUUID && crypto.randomUUID()) || (Date.now() + "-" + Math.random().toString(36).slice(2)),
+    nom, quantite, unite, estCoche: false, ordre: (liste.articles || []).length,
+  };
+  try {
+    await db.collection("listes").doc(listeOuverte).update({
+      articles: [...(liste.articles || []), article],
+    });
+    nomInp.value = "";
+    qteInp.value = "";
+    nomInp.focus();
+  } catch (e) {
+    toast("Erreur : " + e.message, "error");
+  }
+}
+
+async function toggleArticle(articleId, coche) {
+  if (!listeOuverte) return;
+  const liste = listes.find((l) => l.id === listeOuverte);
+  if (!liste) return;
+  const updated = (liste.articles || []).map((a) => a.id === articleId ? { ...a, estCoche: coche } : a);
+  try {
+    await db.collection("listes").doc(listeOuverte).update({ articles: updated });
+  } catch (e) {
+    toast("Erreur : " + e.message, "error");
+  }
+}
+
+async function supprimerArticle(articleId) {
+  if (!listeOuverte) return;
+  const liste = listes.find((l) => l.id === listeOuverte);
+  if (!liste) return;
+  const updated = (liste.articles || []).filter((a) => a.id !== articleId);
+  try {
+    await db.collection("listes").doc(listeOuverte).update({ articles: updated });
+  } catch (e) {
+    toast("Erreur : " + e.message, "error");
+  }
+}
+
+function lundiDeISO(d) {
+  const x = new Date(d);
+  const j = x.getDay();
+  const diff = j === 0 ? -6 : 1 - j;
+  x.setDate(x.getDate() + diff);
+  return toISO(x);
+}
+function toISO(d) {
+  return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+}
+function joursDeSemaine(lundiISO) {
+  const lundi = new Date(lundiISO + "T00:00:00");
+  return Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(lundi);
+    d.setDate(lundi.getDate() + i);
+    return toISO(d);
+  });
+}
+const JOURS_NOMS = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"];
+const MOIS_NOMS = ["janv.", "févr.", "mars", "avr.", "mai", "juin", "juil.", "août", "sept.", "oct.", "nov.", "déc."];
+
+function changeSemaine(delta) {
+  const d = new Date(lundiCourant + "T00:00:00");
+  d.setDate(d.getDate() + 7 * delta);
+  lundiCourant = toISO(d);
+  renderPlan();
+}
+
+function renderPlan() {
+  const jours = joursDeSemaine(lundiCourant);
+  const lundi = new Date(jours[0] + "T00:00:00");
+  const dim = new Date(jours[6] + "T00:00:00");
+  $("week-label").textContent =
+    `${lundi.getDate()} ${MOIS_NOMS[lundi.getMonth()]} – ${dim.getDate()} ${MOIS_NOMS[dim.getMonth()]}`;
+
+  let html = "";
+  jours.forEach((isoDate, i) => {
+    const d = new Date(isoDate + "T00:00:00");
+    const souper = plan.find((s) => s.date === isoDate);
+    const valeur = souper ? (souper.nomLibre || souper.recetteTitre || "") : "";
+    html += `<div class="jour">
+      <div class="jour-hdr">
+        <span class="jour-jour">${JOURS_NOMS[i]}</span>
+        <span class="jour-date">${d.getDate()} ${MOIS_NOMS[d.getMonth()]}</span>
+      </div>
+      <div class="jour-input">
+        <input type="text" placeholder="Ex : Spaghetti…" value="${escAttr(valeur)}" data-date="${isoDate}" class="jour-input-field" />
+        ${valeur ? `<button class="btn-clear" type="button" data-clear-date="${isoDate}" aria-label="Effacer"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="20" height="20"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>` : ""}
+      </div>
+    </div>`;
+  });
+  $("plan-list").innerHTML = html;
+}
+
+$("plan-list").addEventListener("blur", (e) => {
+  if (e.target.classList && e.target.classList.contains("jour-input-field")) sauverJour(e.target);
+}, true);
+$("plan-list").addEventListener("keydown", (e) => {
+  if (e.key === "Enter" && e.target.classList && e.target.classList.contains("jour-input-field")) {
+    e.preventDefault();
+    e.target.blur();
+  }
+});
+$("plan-list").addEventListener("click", (e) => {
+  const btn = e.target.closest("[data-clear-date]");
+  if (btn) viderJour(btn.dataset.clearDate);
+});
+
+async function sauverJour(inp) {
+  const date = inp.dataset.date;
+  const nomLibre = inp.value.trim();
+  const existant = plan.find((s) => s.date === date);
+  try {
+    if (existant) {
+      if (!nomLibre) {
+        await db.collection("planSemaine").doc(existant.id).delete();
+      } else if (nomLibre !== existant.nomLibre) {
+        await db.collection("planSemaine").doc(existant.id).update({ nomLibre, recetteId: null, recetteTitre: "" });
+      }
+    } else if (nomLibre) {
+      await db.collection("planSemaine").add({ date, nomLibre, recetteId: null, recetteTitre: "" });
+    }
+  } catch (e) {
+    toast("Erreur : " + e.message, "error");
+  }
+}
+
+async function viderJour(date) {
+  const existant = plan.find((s) => s.date === date);
+  if (!existant) return;
+  try {
+    await db.collection("planSemaine").doc(existant.id).delete();
+  } catch (e) {
+    toast("Erreur : " + e.message, "error");
+  }
+}
+
+$("new-magasin").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); ajouterMagasin(); } });
+$("new-article-nom").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); ajouterArticle(); } });
+$("new-article-qte").addEventListener("keydown", (e) => { if (e.key === "Enter") { e.preventDefault(); $("new-article-nom").focus(); } });
+</script>
+</body>
 </html>
