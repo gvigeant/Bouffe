@@ -4,7 +4,7 @@ import tailwindcss from '@tailwindcss/vite'
 import { VitePWA } from 'vite-plugin-pwa'
 
 export default defineConfig({
-  base: '/bouffe/',
+  base: '/Bouffe/',
   plugins: [
     react(),
     tailwindcss(),
@@ -13,8 +13,8 @@ export default defineConfig({
       includeAssets: ['favicon.ico', 'icons/icon-192.png', 'icons/icon-512.png'],
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,woff2}'],
-        navigateFallback: '/bouffe/index.html',
-        navigateFallbackDenylist: [/^\/bouffe\/api/],
+        navigateFallback: '/Bouffe/index.html',
+        navigateFallbackDenylist: [/^\/Bouffe\/api/],
       },
       devOptions: { enabled: false },
     }),

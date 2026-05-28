@@ -2,20 +2,20 @@
   "name": "Bouffe",
   "short_name": "Bouffe",
   "description": "Recettes, épicerie & plan de soupers",
-  "start_url": "/bouffe/",
+  "start_url": "/Bouffe/",
   "display": "standalone",
   "background_color": "#F5F5F7",
   "theme_color": "#F97316",
   "orientation": "portrait",
   "icons": [
     {
-      "src": "/bouffe/icons/icon-192.png",
+      "src": "/Bouffe/icons/icon-192.png",
       "sizes": "192x192",
       "type": "image/png",
       "purpose": "any maskable"
     },
     {
-      "src": "/bouffe/icons/icon-512.png",
+      "src": "/Bouffe/icons/icon-512.png",
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"

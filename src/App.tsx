@@ -98,7 +98,7 @@ function AppRoutes() {
 export default function App() {
   return (
     <AuthProvider>
-      <BrowserRouter basename="/bouffe">
+      <BrowserRouter basename="/Bouffe">
         <AppRoutes />
       </BrowserRouter>
     </AuthProvider>
